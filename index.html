@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ramona English - Continuous Pro</title>
+    <title>Ramona English - Ultimate Real Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         body { overscroll-behavior-y: none; background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
         .app-container { height: 100vh; height: 100dvh; }
-        .pulse-live { animation: live-glow 1.5s infinite; }
-        @keyframes live-glow {
-            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        .recording-pulse { animation: pulse-red 1.2s infinite; }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.7); }
+            70% { box-shadow: 0 0 0 14px rgba(225, 29, 72, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0); }
         }
     </style>
 </head>
@@ -28,14 +28,14 @@
                     <h1 class="font-bold text-sm text-slate-100 flex items-center gap-1">
                         <span id="tutor-name">Ramona</span> 
                     </h1>
-                    <span id="level-display" class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30">
-                        Manos Libres Continuo | Básico
+                    <span id="level-display" class="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-500/30">
+                        Nivel: Básico | 1.0x
                     </span>
                 </div>
             </div>
             <div class="flex items-center space-x-1">
-                <button onclick="toggleContinuousState()" id="pause-play-btn" class="text-xs bg-slate-700 text-slate-200 px-2.5 py-1.5 rounded-lg shadow font-medium">Pausar</button>
-                <button onclick="toggleSettingsModal()" class="text-slate-300 hover:text-white p-2 rounded-lg bg-slate-700/60"><i class="fa-solid fa-gear text-base"></i></button>
+                <button onclick="repeatLastMessage()" class="text-slate-400 hover:text-white p-2" title="Repetir audio"><i class="fa-solid fa-volume-high text-base"></i></button>
+                <button onclick="toggleSettingsModal()" class="text-slate-300 hover:text-white p-2 rounded-lg bg-slate-700/60" title="Ajustes"><i class="fa-solid fa-gear text-base"></i></button>
             </div>
         </header>
 
@@ -62,6 +62,13 @@
                         <button onclick="setSpeed(1.2)" id="speed-12" class="py-1.5 rounded-lg bg-slate-700 text-slate-300 text-xs">1.2x</button>
                     </div>
                 </div>
+                <div class="space-y-1.5">
+                    <label class="text-xs text-slate-400 font-medium">Voz:</label>
+                    <button onclick="toggleVoiceGender()" id="voice-toggle-card" class="w-full py-2 px-3 rounded-lg bg-slate-700 text-slate-200 text-xs flex items-center justify-between">
+                        <span>Mujer (Ramona)</span>
+                        <i class="fa-solid fa-venus text-pink-400"></i>
+                    </button>
+                </div>
                 <button onclick="toggleSettingsModal()" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl">Cerrar</button>
             </div>
         </div>
@@ -71,18 +78,30 @@
             <div class="flex items-start space-x-2">
                 <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">R</div>
                 <div class="bg-slate-800 border border-slate-700 rounded-2xl rounded-tl-sm p-3.5 max-w-[85%] text-sm text-slate-200 shadow-md">
-                    <p>Hello Mario! I am Ramona. El modo continuo está activo. Conecta tus audífonos y habla con total libertad; te escucharé y responderé sin que toques ningún botón.<br><br>How is your day going?</p>
+                    <p>Hello Mario! I am Ramona, your native English tutor. You can write your orders or messages below anytime, or tap the microphone strictly when you want to talk.<br><br>How is your presentation or your day going?</p>
                 </div>
             </div>
         </div>
 
-        <!-- INDICADOR INFERIOR DE ESTADO CONTINUO -->
-        <div class="bg-slate-800 border-t border-slate-700 px-4 py-3 flex items-center justify-between text-xs text-slate-300">
-            <div class="flex items-center space-x-2.5">
-                <div id="status-dot" class="w-3 h-3 rounded-full bg-emerald-500 pulse-live"></div>
-                <span id="status-label">Escuchando en vivo... Habla cuando gustes</span>
+        <!-- PANEL DE CONTROL TOTAL (TEXTO HABILITADO + MIC MANUAL SEGURO) -->
+        <div class="bg-slate-800 border-t border-slate-700 p-3 flex flex-col space-y-2">
+            <div class="flex items-center space-x-2">
+                <!-- Botón de Micrófono Manual Estricto (Sin bloqueos) -->
+                <button id="mic-btn" onclick="toggleStrictRecording()" class="bg-indigo-600 hover:bg-indigo-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 shadow-lg transition-transform active:scale-95" title="Toca para hablar">
+                    <i id="mic-icon" class="fa-solid fa-microphone"></i>
+                </button>
+                
+                <!-- Caja de Texto Completamente Habilitada -->
+                <form onsubmit="handleTextSubmit(event)" class="flex-1 flex items-center space-x-1">
+                    <input type="text" id="user-input" placeholder="Escribe tu orden o mensaje aquí..." autocomplete="off"
+                        class="w-full bg-slate-900 border border-slate-700 text-slate-100 placeholder-slate-500 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500">
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-3 rounded-xl text-sm shadow"><i class="fa-solid fa-paper-plane"></i></button>
+                </form>
             </div>
-            <button onclick="forceRestartListening()" class="bg-slate-700 hover:bg-slate-600 text-white px-2.5 py-1 rounded">Reiniciar</button>
+            <div class="flex justify-between items-center px-1">
+                <span id="recording-status" class="text-[11px] text-slate-400 italic">Micrófono completamente cerrado (Seguro)</span>
+                <span class="text-[10px] text-slate-500">Mario Orbea</span>
+            </div>
         </div>
 
     </div>
@@ -90,13 +109,12 @@
     <script>
         const synth = window.speechSynthesis;
         let recognition = null;
-        let isRunning = true;
-        let isSpeaking = false;
+        let isRecording = false;
         let speechRate = 1.0;
         let currentLevel = "Básico";
         let isMaleVoice = false;
         let voicesList = [];
-        let conversationTurn = 0;
+        let lastMessageText = "Hello Mario! How is your day going?";
 
         function loadVoices() { voicesList = synth.getVoices(); }
         synth.onvoiceschanged = loadVoices;
@@ -106,138 +124,150 @@
             document.getElementById('settings-modal').classList.toggle('hidden');
         }
 
-        // MOTOR DE ESCUCHA CONTINUA AUTOMATIZADA
-        function startContinuousEngine() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                alert("Tu navegador no soporta reconocimiento de voz continuo. Usa Google Chrome o Safari actualizado.");
+        // CONTROL ESTRICTO DE MICRÓFONO: SE ABRE Y SE CIERRA AL INSTANTE
+        function toggleStrictRecording() {
+            if (synth.speaking) synth.cancel();
+
+            if (isRecording) {
+                forceStopMic();
                 return;
             }
 
-            if (recognition) {
-                try { recognition.stop(); } catch(e){}
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("Tu navegador no soporta reconocimiento de voz. Usa Google Chrome o Safari.");
+                return;
             }
 
-            recognition = new SpeechRecognition();
-            recognition.lang = 'en-US';
-            recognition.continuous = false;
-            recognition.interimResults = false;
-
-            recognition.onstart = () => {
-                if (!isSpeaking && isRunning) {
-                    document.getElementById('status-dot').className = "w-3 h-3 rounded-full bg-emerald-500 pulse-live";
-                    document.getElementById('status-label').innerText = "Escuchando... Habla libremente";
-                }
-            };
-
-            recognition.onresult = (event) => {
-                const text = event.results[0][0].transcript.trim();
-                if (text && !isSpeaking) {
-                    processContinuousDialogue(text);
-                }
-            };
-
-            recognition.onerror = () => {
-                if (isRunning && !isSpeaking) {
-                    setTimeout(() => restartRecognitionSafe(), 500);
-                }
-            };
-
-            recognition.onend = () => {
-                // Ciclo automático: si Ramona no está hablando y el modo está activo, vuelve a escuchar solo
-                if (isRunning && !isSpeaking) {
-                    setTimeout(() => restartRecognitionSafe(), 300);
-                }
-            };
-
-            restartRecognitionSafe();
-        }
-
-        function restartRecognitionSafe() {
-            if (!isRunning || isSpeaking) return;
             try {
+                recognition = new SpeechRecognition();
+                recognition.lang = 'en-US';
+                recognition.continuous = false;
+                recognition.interimResults = false;
+
+                recognition.onstart = () => {
+                    isRecording = true;
+                    const btn = document.getElementById('mic-btn');
+                    const icon = document.getElementById('mic-icon');
+                    btn.className = "bg-rose-600 hover:bg-rose-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 shadow-lg recording-pulse transition-transform";
+                    icon.className = "fa-solid fa-stop";
+                    document.getElementById('recording-status').innerText = "Grabando... Habla y se cerrará solo.";
+                };
+
+                recognition.onresult = (event) => {
+                    const text = event.results[0][0].transcript.trim();
+                    forceStopMic();
+                    if (text) {
+                        processUserMessage(text);
+                    }
+                };
+
+                recognition.onerror = () => {
+                    forceStopMic();
+                    document.getElementById('recording-status').innerText = "Micrófono cerrado. Intenta de nuevo.";
+                };
+
+                recognition.onend = () => {
+                    forceStopMic();
+                };
+
                 recognition.start();
-            } catch(e) {
-                // Ya estaba activo o esperando ciclo
+            } catch (e) {
+                forceStopMic();
             }
         }
 
-        function toggleContinuousState() {
-            isRunning = !isRunning;
-            const btn = document.getElementById('pause-play-btn');
-            if (isRunning) {
-                btn.innerText = "Pausar";
-                btn.className = "text-xs bg-slate-700 text-slate-200 px-2.5 py-1.5 rounded-lg shadow font-medium";
-                startContinuousEngine();
-            } else {
-                btn.innerText = "Reanudar";
-                btn.className = "text-xs bg-emerald-600 text-white px-2.5 py-1.5 rounded-lg shadow font-medium";
-                try { recognition.stop(); } catch(e){}
-                document.getElementById('status-dot').className = "w-3 h-3 rounded-full bg-slate-500";
-                document.getElementById('status-label').innerText = "En pausa (Toca Reanudar)";
+        function forceStopMic() {
+            isRecording = false;
+            if (recognition) {
+                try {
+                    recognition.stop();
+                    recognition.abort();
+                } catch(e) {}
+                recognition = null;
             }
-        }
-
-        function forceRestartListening() {
-            if (synth.speaking) synth.cancel();
-            isSpeaking = false;
-            startContinuousEngine();
+            const btn = document.getElementById('mic-btn');
+            const icon = document.getElementById('mic-icon');
+            if (btn && icon) {
+                btn.className = "bg-indigo-600 hover:bg-indigo-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 shadow-lg transition-transform active:scale-95";
+                icon.className = "fa-solid fa-microphone";
+            }
+            const status = document.getElementById('recording-status');
+            if (status) {
+                status.innerText = "Micrófono completamente cerrado (Seguro)";
+            }
         }
 
         function setLevel(level) {
             currentLevel = level;
-            document.getElementById('level-display').innerText = `Manos Libres Continuo | ${currentLevel}`;
+            document.getElementById('level-display').innerText = `Nivel: ${currentLevel} | ${speechRate}x`;
             ['Básico', 'Medio', 'Avanzado'].forEach(lvl => {
                 const b = document.getElementById(`modal-btn-${lvl.toLowerCase()}`);
                 if (lvl === level) b.className = "py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-semibold";
                 else b.className = "py-1.5 rounded-lg bg-slate-700 text-slate-300 text-xs font-semibold";
             });
-            speakRamona(`Switched to ${level} level. Let's continue.`);
+            speakRamona(`Switched to ${level} level. Let's keep talking.`);
         }
 
         function setSpeed(rate) {
             speechRate = rate;
+            document.getElementById('level-display').innerText = `Nivel: ${currentLevel} | ${speechRate}x`;
             [0.8, 1.0, 1.2].forEach(r => {
                 const b = document.getElementById(`speed-${r.toString().replace('.', '')}`);
                 if (r === rate) b.className = "py-1.5 rounded-lg bg-indigo-600 text-white text-xs";
                 else b.className = "py-1.5 rounded-lg bg-slate-700 text-slate-300 text-xs";
             });
-            speakRamona("Speed adjusted.");
         }
 
-        // HABLA DE RAMONA Y GESTIÓN DE AUDIO PARA AUDÍFONOS
-        function speakRamona(text) {
-            isSpeaking = true;
-            try { recognition.stop(); } catch(e){} // Pausa el mic mientras habla para evitar eco en audífonos
-            if (synth.speaking) synth.cancel();
+        function toggleVoiceGender() {
+            isMaleVoice = !isMaleVoice;
+            const card = document.getElementById('voice-toggle-card');
+            const avatar = document.getElementById('avatar-icon');
+            const tutorName = document.getElementById('tutor-name');
+            
+            if (isMaleVoice) {
+                card.innerHTML = '<span>Hombre (Ray)</span><i class="fa-solid fa-mars text-blue-400"></i>';
+                avatar.className = "w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-base shadow";
+                tutorName.innerText = "Ray";
+            } else {
+                card.innerHTML = '<span>Mujer (Ramona)</span><i class="fa-solid fa-venus text-pink-400"></i>';
+                avatar.className = "w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-base shadow";
+                tutorName.innerText = "Ramona";
+            }
+            speakRamona("Voice updated.");
+        }
 
-            document.getElementById('status-dot').className = "w-3 h-3 rounded-full bg-indigo-500 animate-bounce";
-            document.getElementById('status-label').innerText = "Ramona está hablando...";
+        function repeatLastMessage() {
+            speakRamona(lastMessageText);
+        }
+
+        function speakRamona(text) {
+            forceStopMic();
+            lastMessageText = text;
+            if (synth.speaking) synth.cancel();
 
             const utterThis = new SpeechSynthesisUtterance(text);
             utterThis.rate = speechRate;
-            utterThis.pitch = 1.2;
+            utterThis.pitch = isMaleVoice ? 0.8 : 1.2;
             utterThis.lang = 'en-US';
 
             loadVoices();
-            const voice = voicesList.find(v => v.lang.includes('en') && (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('zira') || v.name.toLowerCase().includes('samantha'))) || voicesList[0];
+            const voice = voicesList.find(v => {
+                if (isMaleVoice) return v.lang.includes('en') && (v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('david'));
+                return v.lang.includes('en') && (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('zira') || v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('karen'));
+            }) || voicesList.find(v => v.lang.includes('en')) || voicesList[0];
+
             if (voice) utterThis.voice = voice;
-
-            utterThis.onend = () => {
-                isSpeaking = false;
-                if (isRunning) {
-                    // Al terminar de hablar, reactiva automáticamente la escucha manos libres
-                    setTimeout(() => restartRecognitionSafe(), 400);
-                }
-            };
-
             synth.speak(utterThis);
         }
 
-        // DIÁLOGO CONTINUO ABIERTO Y HUMANO
-        function processContinuousDialogue(text) {
+        // MOTOR DE CONVERSACIÓN INTELIGENTE Y COHERENTE (NATURAL AMERICAN ENGLISH)
+        function processUserMessage(text) {
+            forceStopMic();
             const chatContainer = document.getElementById('chat-container');
+            const lower = text.toLowerCase();
 
+            // Mostrar mensaje del usuario
             chatContainer.innerHTML += `
                 <div class="flex items-start justify-end space-x-2">
                     <div class="bg-indigo-600 text-white rounded-2xl rounded-tr-sm p-3.5 max-w-[85%] text-sm shadow">
@@ -248,34 +278,39 @@
             `;
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
-            conversationTurn++;
             let responseText = "";
 
-            const poolBasic = [
-                `That's awesome, Mario! Tell me more about what you like doing on your free time.`,
-                `I see! How long have you enjoyed doing that?`,
-                `That sounds really nice. What is another hobby you have?`,
-                `Thanks for sharing that with me, Mario. Do you usually do that every day?`
-            ];
-
-            const poolMedium = [
-                `That's a very interesting point of view, Mario. What do you think is the main reason behind that?`,
-                `Makes total sense! Have you always felt that way, or did something change recently?`,
-                `I appreciate your perspective. How does that usually fit into your daily schedule?`
-            ];
-
-            const poolAdvanced = [
-                `That's quite a thoughtful perspective, Mario. What underlying factors do you think contribute most to that situation?`,
-                `A fascinating observation. How do you usually handle challenges when working on projects like that?`,
-                `An insightful comment indeed. Could you elaborate on how that impacts your long-term goals?`
-            ];
-
-            if (currentLevel === "Básico") {
-                responseText = poolBasic[conversationTurn % poolBasic.length];
-            } else if (currentLevel === "Medio") {
-                responseText = poolMedium[conversationTurn % poolMedium.length];
+            // Gestión de comandos directos del usuario
+            if (lower.includes('baja la velocidad') || lower.includes('slow down')) {
+                setSpeed(0.8);
+                responseText = "Got it, Mario. I am speaking slower now. Let's continue our talk.";
+            } else if (lower.includes('nivel medio')) {
+                setLevel('Medio');
+                return;
+            } else if (lower.includes('nivel avanzado')) {
+                setLevel('Avanzado');
+                return;
+            } else if (lower.includes('nivel básico')) {
+                setLevel('Básico');
+                return;
             } else {
-                responseText = poolAdvanced[conversationTurn % poolAdvanced.length];
+                // Respuestas conversacionales naturales y coherentes adaptadas al inglés americano
+                if (lower.includes('presentation') || lower.includes('presentación') || lower.includes('practice')) {
+                    responseText = `That's awesome that you're practicing a presentation, Mario! Presentations can be tricky. What is the main topic or goal of your presentation?`;
+                } else if (lower.includes('hobby') || lower.includes('music') || lower.includes('guitar')) {
+                    responseText = `That's a fantastic interest, Mario! Playing music is such a great outlet. How long have you been into that?`;
+                } else if (lower.includes('work') || lower.includes('job') || lower.includes('stocker')) {
+                    responseText = `Working hard keeps us sharp, Mario. How has your schedule been treating you lately?`;
+                } else {
+                    // Generador inteligente basado en el texto del usuario para dar total coherencia nativa
+                    if (currentLevel === "Básico") {
+                        responseText = `I hear you, Mario! When you talk about "${text}", it reminds me how important daily practice is. Tell me more about that!`;
+                    } else if (currentLevel === "Medio") {
+                        responseText = `That's a really good point regarding "${text}", Mario. What do you think makes that particular aspect so important to you?`;
+                    } else {
+                        responseText = `Analyzing your thoughts on "${text}", Mario, it highlights a broader perspective. How do you usually manage situations like that?`;
+                    }
+                }
             }
 
             setTimeout(() => {
@@ -290,7 +325,17 @@
                 `;
                 chatContainer.scrollTop = chatContainer.scrollHeight;
                 speakRamona(responseText);
-            }, 300);
+            }, 400);
+        }
+
+        function handleTextSubmit(e) {
+            e.preventDefault();
+            forceStopMic();
+            const input = document.getElementById('user-input');
+            const val = input.value.trim();
+            if (!val) return;
+            input.value = '';
+            processUserMessage(val);
         }
 
         function escapeHtml(text) {
@@ -298,10 +343,10 @@
         }
 
         window.onload = () => {
+            forceStopMic();
             setTimeout(() => {
-                startContinuousEngine();
-                speakRamona("Hello Mario! I am Ramona. Continuous hands-free mode is active. Put on your headphones and let's talk normally. How is your day going?");
-            }, 800);
+                speakRamona("Hello Mario! I am Ramona. The text box is fully open for your orders, and the microphone is safely manual. Let's chat!");
+            }, 500);
         };
     </script>
 </body>
