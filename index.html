@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ramona English - Human Real Pro</title>
+    <title>Ramona English - Natural Hands-Free</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         body { overscroll-behavior-y: none; background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
         .app-container { height: 100vh; height: 100dvh; }
-        .recording-pulse { animation: pulse-red 1.2s infinite; }
-        @keyframes pulse-red {
-            0% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.7); }
-            70% { box-shadow: 0 0 0 14px rgba(225, 29, 72, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0); }
+        .pulse-active { animation: pulse-glow 1.5s infinite; }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(99, 102, 241, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
         }
     </style>
 </head>
@@ -21,55 +21,49 @@
     <div class="app-container max-w-md mx-auto w-full flex flex-col bg-slate-900 shadow-2xl relative border-x border-slate-800">
         
         <!-- HEADER -->
-        <header class="bg-slate-800 border-b border-slate-700 px-3 py-3 flex items-center justify-between z-10">
-            <div class="flex items-center space-x-2.5">
-                <div id="avatar-icon" class="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-base shadow">R</div>
+        <header class="bg-slate-800 border-b border-slate-700 px-4 py-3 flex items-center justify-between z-10">
+            <div class="flex items-center space-x-3">
+                <div id="avatar-icon" class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-base shadow">R</div>
                 <div>
                     <h1 class="font-bold text-sm text-slate-100 flex items-center gap-1">
                         <span id="tutor-name">Ramona</span> 
                     </h1>
                     <span id="level-display" class="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-500/30">
-                        Nivel: Básico | 1.0x
+                        Modo Manos Libres | Básico
                     </span>
                 </div>
             </div>
-            <div class="flex items-center space-x-1">
-                <button onclick="repeatLastMessage()" class="text-slate-400 hover:text-white p-2" title="Repetir audio"><i class="fa-solid fa-volume-high text-base"></i></button>
-                <button onclick="toggleSettingsModal()" class="text-slate-300 hover:text-white p-2 rounded-lg bg-slate-700/60" title="Ajustes"><i class="fa-solid fa-gear text-base"></i></button>
+            <div class="flex items-center space-x-2">
+                <!-- Botón para alternar modo manos libres automático o manual -->
+                <button onclick="toggleHandsFreeMode()" id="mode-toggle-btn" class="text-xs bg-emerald-600 text-white px-2.5 py-1.5 rounded-lg shadow font-medium" title="Cambiar Modo">Auto: ON</button>
+                <button onclick="toggleSettingsModal()" class="text-slate-300 hover:text-white p-2 rounded-lg bg-slate-700/60"><i class="fa-solid fa-gear text-base"></i></button>
             </div>
         </header>
 
-        <!-- VENTANA FLOTANTE DE AJUSTES -->
+        <!-- VENTANA FLOTANTE DE AJUSTES (Niveles y Voces) -->
         <div id="settings-modal" class="hidden absolute inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-xs p-4 space-y-4 shadow-2xl">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-                    <h2 class="font-bold text-sm text-slate-100"><i class="fa-solid fa-sliders text-indigo-400 mr-2"></i>Ajustes</h2>
+                    <h2 class="font-bold text-sm text-slate-100"><i class="fa-solid fa-sliders text-indigo-400 mr-2"></i>Ajustes de Ramona</h2>
                     <button onclick="toggleSettingsModal()" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-xs text-slate-400 font-medium">Nivel:</label>
+                    <label class="text-xs text-slate-400 font-medium">Nivel de Conversación:</label>
                     <div class="grid grid-cols-3 gap-1.5">
-                        <button onclick="setLevel('Básico')" id="modal-btn-básico" class="py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-semibold">Básico</button>
-                        <button onclick="setLevel('Medio')" id="modal-btn-medio" class="py-1.5 rounded-lg bg-slate-700 text-slate-300 text-xs font-semibold">Medio</button>
-                        <button onclick="setLevel('Avanzado')" id="modal-btn-avanzado" class="py-1.5 rounded-lg bg-slate-700 text-slate-300 text-xs font-semibold">Avanzado</button>
+                        <button onclick="setLevel('Básico')" id="lvl-basico" class="py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-semibold">Básico</button>
+                        <button onclick="setLevel('Medio')" id="lvl-medio" class="py-1.5 rounded-lg bg-slate-700 text-slate-300 text-xs font-semibold">Medio</button>
+                        <button onclick="setLevel('Avanzado')" id="lvl-avanzado" class="py-1.5 rounded-lg bg-slate-700 text-slate-300 text-xs font-semibold">Avanzado</button>
                     </div>
                 </div>
                 <div class="space-y-1.5">
                     <label class="text-xs text-slate-400 font-medium">Velocidad:</label>
                     <div class="grid grid-cols-3 gap-1.5">
-                        <button onclick="setSpeed(0.8)" id="speed-08" class="py-1.5 rounded-lg bg-slate-700 text-slate-300 text-xs">0.8x</button>
-                        <button onclick="setSpeed(1.0)" id="speed-10" class="py-1.5 rounded-lg bg-indigo-600 text-white text-xs">1.0x</button>
-                        <button onclick="setSpeed(1.2)" id="speed-12" class="py-1.5 rounded-lg bg-slate-700 text-slate-300 text-xs">1.2x</button>
+                        <button onclick="setSpeed(0.8)" id="spd-08" class="py-1.5 rounded-lg bg-slate-700 text-slate-300 text-xs">0.8x</button>
+                        <button onclick="setSpeed(1.0)" id="spd-10" class="py-1.5 rounded-lg bg-indigo-600 text-white text-xs">1.0x</button>
+                        <button onclick="setSpeed(1.2)" id="spd-12" class="py-1.5 rounded-lg bg-slate-700 text-slate-300 text-xs">1.2x</button>
                     </div>
                 </div>
-                <div class="space-y-1.5">
-                    <label class="text-xs text-slate-400 font-medium">Voz:</label>
-                    <button onclick="toggleVoiceGender()" id="voice-toggle-card" class="w-full py-2 px-3 rounded-lg bg-slate-700 text-slate-200 text-xs flex items-center justify-between">
-                        <span>Mujer (Ramona)</span>
-                        <i class="fa-solid fa-venus text-pink-400"></i>
-                    </button>
-                </div>
-                <button onclick="toggleSettingsModal()" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl">Cerrar</button>
+                <button onclick="toggleSettingsModal()" class="w-full py-2 bg-indigo-600 text-white text-xs font-semibold rounded-xl">Aplicar y Cerrar</button>
             </div>
         </div>
 
@@ -78,28 +72,18 @@
             <div class="flex items-start space-x-2">
                 <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">R</div>
                 <div class="bg-slate-800 border border-slate-700 rounded-2xl rounded-tl-sm p-3.5 max-w-[85%] text-sm text-slate-200 shadow-md">
-                    <p>Hello Mario! I'm Ramona. It's great to practice with you today. Put on your headphones, tap the microphone when you're ready, and let's have a real chat.<br><br>How is your day going so far?</p>
+                    <p>Hello Mario! I am Ramona. Conecta tus audífonos. El modo automático está activo: háblame con total naturalidad sin tocar nada y te responderé como una persona real.<br><br>How is your day going?</p>
                 </div>
             </div>
         </div>
 
-        <!-- PANEL DE CONTROL DE VOZ -->
-        <div class="bg-slate-800 border-t border-slate-700 p-3 flex flex-col space-y-2">
-            <div class="flex items-center space-x-2">
-                <button id="mic-btn" onclick="toggleManualRecording()" class="bg-indigo-600 hover:bg-indigo-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 shadow-lg transition-transform active:scale-95">
-                    <i id="mic-icon" class="fa-solid fa-microphone"></i>
-                </button>
-                
-                <form onsubmit="handleTextSubmit(event)" class="flex-1 flex items-center space-x-1">
-                    <input type="text" id="user-input" placeholder="Toca el micro o escribe aquí..." autocomplete="off"
-                        class="w-full bg-slate-900 border border-slate-700 text-slate-100 placeholder-slate-500 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500">
-                    <button type="submit" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-3 rounded-xl text-sm shadow"><i class="fa-solid fa-paper-plane"></i></button>
-                </form>
+        <!-- INDICADOR INFERIOR DE ESTADO HUMANO -->
+        <div class="bg-slate-800 border-t border-slate-700 px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div id="status-dot" class="w-3 h-3 rounded-full bg-emerald-500 animate-ping"></div>
+                <span id="status-label" class="text-xs text-slate-300 font-medium">Escuchando a través de tus audífonos...</span>
             </div>
-            <div class="flex justify-between items-center px-1">
-                <span id="recording-status" class="text-[11px] text-slate-400 italic">Micrófono listo (Toca para grabar)</span>
-                <span class="text-[10px] text-slate-500">Mario Orbea</span>
-            </div>
+            <button onclick="manualTriggerListen()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow">Hablar Ahora</button>
         </div>
 
     </div>
@@ -107,15 +91,17 @@
     <script>
         const synth = window.speechSynthesis;
         let recognition = null;
-        let isRecording = false;
+        let isHandsFree = true;
         let speechRate = 1.0;
         let currentLevel = "Básico";
-        let isMaleVoice = false;
-        let voicesList = [];
-        let lastMessageText = "Hello Mario! How is your day going so far?";
+        let isSpeaking = false;
+        let voicesLoaded = false;
         let conversationTurn = 0;
 
-        function loadVoices() { voicesList = synth.getVoices(); }
+        function loadVoices() {
+            synth.getVoices();
+            voicesLoaded = true;
+        }
         synth.onvoiceschanged = loadVoices;
         loadVoices();
 
@@ -123,11 +109,12 @@
             document.getElementById('settings-modal').classList.toggle('hidden');
         }
 
-        function initRecognitionEngine() {
+        // Inicializar reconocimiento optimizado para auriculares y flujo continuo
+        function initContinuousRecognition() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
-                alert("Tu navegador no soporta reconocimiento de voz. Usa Google Chrome.");
-                return false;
+                alert("Tu navegador no soporta reconocimiento de voz continuo. Usa Google Chrome.");
+                return;
             }
 
             recognition = new SpeechRecognition();
@@ -136,127 +123,121 @@
             recognition.interimResults = false;
 
             recognition.onstart = () => {
-                isRecording = true;
-                const btn = document.getElementById('mic-btn');
-                const icon = document.getElementById('mic-icon');
-                btn.className = "bg-rose-600 hover:bg-rose-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 shadow-lg recording-pulse transition-transform";
-                icon.className = "fa-solid fa-stop";
-                document.getElementById('recording-status').innerText = "Escuchando por audífonos... (Habla ahora)";
+                if (isSpeaking) return;
+                document.getElementById('status-dot').className = "w-3 h-3 rounded-full bg-rose-500 pulse-active";
+                document.getElementById('status-label').innerText = "Te escucho atentamente...";
             };
 
             recognition.onresult = (event) => {
                 const text = event.results[0][0].transcript.trim();
                 if (text) {
-                    stopManualRecording();
-                    processUserSpeech(text);
+                    processHumanDialogue(text);
                 }
             };
 
             recognition.onerror = () => {
-                stopManualRecording();
-                document.getElementById('recording-status').innerText = "Micrófono listo. Toca para reintentar.";
+                resumeListening();
             };
 
             recognition.onend = () => {
-                stopManualRecording();
-            };
-            return true;
-        }
-
-        function toggleManualRecording() {
-            if (synth.speaking) synth.cancel();
-
-            if (!recognition) {
-                const success = initRecognitionEngine();
-                if (!success) return;
-            }
-
-            if (isRecording) {
-                try { recognition.stop(); } catch(e){}
-                stopManualRecording();
-            } else {
-                try {
-                    recognition.start();
-                } catch(e) {
-                    isRecording = false;
-                    stopManualRecording();
+                if (isHandsFree && !isSpeaking) {
+                    setTimeout(() => {
+                        try { recognition.start(); } catch(e){}
+                    }, 300);
                 }
+            };
+
+            // Arrancar escucha inicial
+            try {
+                recognition.start();
+            } catch(e){}
+        }
+
+        function resumeListening() {
+            if (isHandsFree && !isSpeaking) {
+                document.getElementById('status-dot').className = "w-3 h-3 rounded-full bg-emerald-500 animate-ping";
+                document.getElementById('status-label').innerText = "Escuchando a través de tus audífonos...";
+                try { recognition.start(); } catch(e){}
             }
         }
 
-        function stopManualRecording() {
-            isRecording = false;
-            const btn = document.getElementById('mic-btn');
-            const icon = document.getElementById('mic-icon');
-            btn.className = "bg-indigo-600 hover:bg-indigo-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 shadow-lg transition-transform active:scale-95";
-            icon.className = "fa-solid fa-microphone";
-            document.getElementById('recording-status').innerText = "Micrófono listo (Toca para grabar)";
+        function manualTriggerListen() {
+            if (synth.speaking) synth.cancel();
+            try {
+                recognition.stop();
+            } catch(e){}
+            setTimeout(() => {
+                try { recognition.start(); } catch(e){}
+            }, 200);
         }
 
-        function setLevel(level) {
-            currentLevel = level;
-            document.getElementById('level-display').innerText = `Nivel: ${currentLevel} | ${speechRate}x`;
-            ['Básico', 'Medio', 'Avanzado'].forEach(lvl => {
-                const b = document.getElementById(`modal-btn-${lvl.toLowerCase()}`);
-                if (lvl === level) b.className = "py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-semibold";
+        function toggleHandsFreeMode() {
+            isHandsFree = !isHandsFree;
+            const btn = document.getElementById('mode-toggle-btn');
+            if (isHandsFree) {
+                btn.innerText = "Auto: ON";
+                btn.className = "text-xs bg-emerald-600 text-white px-2.5 py-1.5 rounded-lg shadow font-medium";
+                resumeListening();
+            } else {
+                btn.innerText = "Auto: OFF";
+                btn.className = "text-xs bg-slate-600 text-white px-2.5 py-1.5 rounded-lg shadow font-medium";
+                try { recognition.stop(); } catch(e){}
+                document.getElementById('status-dot').className = "w-3 h-3 rounded-full bg-slate-500";
+                document.getElementById('status-label').innerText = "Modo manual (Usa 'Hablar Ahora')";
+            }
+        }
+
+        function setLevel(lvl) {
+            currentLevel = lvl;
+            document.getElementById('level-display').innerText = `Modo Manos Libres | ${lvl}`;
+            ['Básico', 'Medio', 'Avanzado'].forEach(l => {
+                const b = document.getElementById(`lvl-${l.toLowerCase()}`);
+                if (l === lvl) b.className = "py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-semibold";
                 else b.className = "py-1.5 rounded-lg bg-slate-700 text-slate-300 text-xs font-semibold";
             });
-            speakRamona(`Switched to ${level} level. Let's keep talking.`);
+            speakRamonaNatural(`Switched to ${lvl} level. Let's keep our conversation flowing.`);
         }
 
         function setSpeed(rate) {
             speechRate = rate;
-            document.getElementById('level-display').innerText = `Nivel: ${currentLevel} | ${speechRate}x`;
             [0.8, 1.0, 1.2].forEach(r => {
-                const b = document.getElementById(`speed-${r.toString().replace('.', '')}`);
+                const b = document.getElementById(`spd-${r.toString().replace('.', '')}`);
                 if (r === rate) b.className = "py-1.5 rounded-lg bg-indigo-600 text-white text-xs";
                 else b.className = "py-1.5 rounded-lg bg-slate-700 text-slate-300 text-xs";
             });
+            speakRamonaNatural(`Speed adjusted.`);
         }
 
-        function toggleVoiceGender() {
-            isMaleVoice = !isMaleVoice;
-            const card = document.getElementById('voice-toggle-card');
-            const avatar = document.getElementById('avatar-icon');
-            const tutorName = document.getElementById('tutor-name');
-            
-            if (isMaleVoice) {
-                card.innerHTML = '<span>Hombre (Ray)</span><i class="fa-solid fa-mars text-blue-400"></i>';
-                avatar.className = "w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-base shadow";
-                tutorName.innerText = "Ray";
-            } else {
-                card.innerHTML = '<span>Mujer (Ramona)</span><i class="fa-solid fa-venus text-pink-400"></i>';
-                avatar.className = "w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-base shadow";
-                tutorName.innerText = "Ramona";
-            }
-            speakRamona("Voice updated.");
-        }
-
-        function repeatLastMessage() {
-            speakRamona(lastMessageText);
-        }
-
-        function speakRamona(text) {
-            lastMessageText = text;
+        // MOTOR DE VOZ NATURAL (Redirige audio perfecto a audífonos)
+        function speakRamonaNatural(text) {
+            isSpeaking = true;
+            try { recognition.stop(); } catch(e){}
             if (synth.speaking) synth.cancel();
 
-            const utterThis = new SpeechSynthesisUtterance(text);
-            utterThis.rate = speechRate;
-            utterThis.pitch = isMaleVoice ? 0.8 : 1.2;
-            utterThis.lang = 'en-US';
+            document.getElementById('status-dot').className = "w-3 h-3 rounded-full bg-indigo-500 animate-bounce";
+            document.getElementById('status-label').innerText = "Ramona está hablando...";
 
-            loadVoices();
-            const voice = voicesList.find(v => {
-                if (isMaleVoice) return v.lang.includes('en') && (v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('david'));
-                return v.lang.includes('en') && (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('zira') || v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('karen'));
-            }) || voicesList.find(v => v.lang.includes('en')) || voicesList[0];
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.rate = speechRate;
+            utter.pitch = 1.1; // Tono cálido de mujer
+            utter.lang = 'en-US';
 
-            if (voice) utterThis.voice = voice;
-            synth.speak(utterThis);
+            const voices = synth.getVoices();
+            const voice = voices.find(v => v.lang.includes('en') && (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('zira') || v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('karen'))) || voices[0];
+            if (voice) utter.voice = voice;
+
+            utter.onend = () => {
+                isSpeaking = false;
+                if (isHandsFree) {
+                    setTimeout(() => resumeListening(), 400);
+                }
+            };
+
+            synth.speak(utter);
         }
 
-        // DIÁLOGO HUMANO Y ABIERTO REAL (LIBRE DE BUCLES ROBÓTICOS)
-        function processUserSpeech(text) {
+        // DIÁLOGO HUMANO Y ABIERTO (Libre de bucles robóticos)
+        function processHumanDialogue(text) {
             const chatContainer = document.getElementById('chat-container');
 
             chatContainer.innerHTML += `
@@ -271,38 +252,32 @@
 
             conversationTurn++;
             let responseText = "";
-            const lower = text.toLowerCase();
 
-            // Lógica de conversación natural estilo humano
-            if (lower.includes('correction') || lower.includes('mistake') || lower.includes('correct')) {
-                responseText = `Sure thing, Mario! Overall your sentence was good, but always pay attention to your verb tenses. Let's keep going: What are your plans for tomorrow?`;
+            const poolBasic = [
+                `That's awesome, Mario! Tell me more about what you like doing on your free time.`,
+                `I see! How long have you enjoyed doing that?`,
+                `That sounds really nice. What is another hobby you have?`,
+                `Thanks for sharing that with me, Mario. Do you usually do that every day?`
+            ];
+
+            const poolMedium = [
+                `That's a very interesting point of view, Mario. What do you think is the main reason behind that?`,
+                `Makes total sense! Have you always felt that way, or did something change recently?`,
+                `I appreciate your perspective. How does that usually fit into your daily schedule?`
+            ];
+
+            const poolAdvanced = [
+                `That's quite a thoughtful perspective, Mario. What underlying factors do you think contribute most to that situation?`,
+                `A fascinating observation. How do you usually handle challenges when working on projects like that?`,
+                `An insightful comment indeed. Could you elaborate on how that impacts your long-term goals?`
+            ];
+
+            if (currentLevel === "Básico") {
+                responseText = poolBasic[conversationTurn % poolBasic.length];
+            } else if (currentLevel === "Medio") {
+                responseText = poolMedium[conversationTurn % poolMedium.length];
             } else {
-                const responsesBasic = [
-                    `That's really interesting, Mario! Tell me more about that.`,
-                    `I understand. How long have you been interested in that topic?`,
-                    `That sounds cool! What is another thing you like to do during your week?`,
-                    `Thanks for sharing, Mario. Do you prefer doing that in the morning or at night?`
-                ];
-                
-                const responsesMedium = [
-                    `That's a solid point, Mario. What do you think is the main reason behind that?`,
-                    `Very interesting observation! Have you always felt that way, or did something change recently?`,
-                    `I see where you're coming from. How does that usually impact your daily routine?`
-                ];
-
-                const responsesAdvanced = [
-                    `That's quite a nuanced perspective, Mario. What underlying factors do you believe contribute most to that outcome?`,
-                    `Fascinating viewpoint. How do you reconcile that approach when facing unexpected challenges?`,
-                    `An insightful observation indeed. Could you elaborate on the long-term implications of that?`
-                ];
-
-                if (currentLevel === "Básico") {
-                    responseText = responsesBasic[conversationTurn % responsesBasic.length];
-                } else if (currentLevel === "Medio") {
-                    responseText = responsesMedium[conversationTurn % responsesMedium.length];
-                } else {
-                    responseText = responsesAdvanced[conversationTurn % responsesAdvanced.length];
-                }
+                responseText = poolAdvanced[conversationTurn % poolAdvanced.length];
             }
 
             setTimeout(() => {
@@ -316,17 +291,8 @@
                     </div>
                 `;
                 chatContainer.scrollTop = chatContainer.scrollHeight;
-                speakRamona(responseText);
-            }, 400);
-        }
-
-        function handleTextSubmit(e) {
-            e.preventDefault();
-            const input = document.getElementById('user-input');
-            const val = input.value.trim();
-            if (!val) return;
-            input.value = '';
-            processUserSpeech(val);
+                speakRamonaNatural(responseText);
+            }, 300);
         }
 
         function escapeHtml(text) {
@@ -335,8 +301,9 @@
 
         window.onload = () => {
             setTimeout(() => {
-                speakRamona("Hello Mario! I am Ramona. Put on your headphones, tap the microphone when you want to talk, and let's have a normal conversation.");
-            }, 500);
+                initContinuousRecognition();
+                speakRamonaNatural("Hello Mario! I am Ramona. Put on your headphones, relax, and let's have a completely normal conversation. How is your day going?");
+            }, 800);
         };
     </script>
 </body>
