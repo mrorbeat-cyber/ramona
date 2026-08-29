@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ramona English - Clean Pro</title>
+    <title>Ramona English - Human Real Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         body { overscroll-behavior-y: none; background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
         .app-container { height: 100vh; height: 100dvh; }
-        .recording-active { animation: pulse-red 1.2s infinite; }
+        .recording-pulse { animation: pulse-red 1.2s infinite; }
         @keyframes pulse-red {
             0% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.7); }
             70% { box-shadow: 0 0 0 14px rgba(225, 29, 72, 0); }
@@ -20,7 +20,7 @@
 <body class="flex flex-col h-full overflow-hidden">
     <div class="app-container max-w-md mx-auto w-full flex flex-col bg-slate-900 shadow-2xl relative border-x border-slate-800">
         
-        <!-- HEADER LIMPIO -->
+        <!-- HEADER -->
         <header class="bg-slate-800 border-b border-slate-700 px-3 py-3 flex items-center justify-between z-10">
             <div class="flex items-center space-x-2.5">
                 <div id="avatar-icon" class="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-base shadow">R</div>
@@ -28,58 +28,48 @@
                     <h1 class="font-bold text-sm text-slate-100 flex items-center gap-1">
                         <span id="tutor-name">Ramona</span> 
                     </h1>
-                    <!-- Insignia informativa del estado actual -->
                     <span id="level-display" class="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-500/30">
                         Nivel: Básico | 1.0x
                     </span>
                 </div>
             </div>
             <div class="flex items-center space-x-1">
-                <!-- Botón repetir último audio -->
                 <button onclick="repeatLastMessage()" class="text-slate-400 hover:text-white p-2" title="Repetir audio"><i class="fa-solid fa-volume-high text-base"></i></button>
-                <!-- Botón Engranaje para abrir la Ventana Flotante de Opciones -->
-                <button onclick="toggleSettingsModal()" class="text-slate-300 hover:text-white p-2 rounded-lg bg-slate-700/60 transition-colors" title="Ajustes y Niveles"><i class="fa-solid fa-gear text-base"></i></button>
+                <button onclick="toggleSettingsModal()" class="text-slate-300 hover:text-white p-2 rounded-lg bg-slate-700/60" title="Ajustes"><i class="fa-solid fa-gear text-base"></i></button>
             </div>
         </header>
 
-        <!-- VENTANA FLOTANTE OCULTA DE CONFIGURACIÓN (MODAL) -->
+        <!-- VENTANA FLOTANTE DE AJUSTES -->
         <div id="settings-modal" class="hidden absolute inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-xs p-4 space-y-4 shadow-2xl">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-                    <h2 class="font-bold text-sm text-slate-100"><i class="fa-solid fa-sliders text-indigo-400 mr-2"></i>Ajustes de Ramona</h2>
+                    <h2 class="font-bold text-sm text-slate-100"><i class="fa-solid fa-sliders text-indigo-400 mr-2"></i>Ajustes</h2>
                     <button onclick="toggleSettingsModal()" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
                 </div>
-
-                <!-- Selector de Niveles -->
                 <div class="space-y-1.5">
-                    <label class="text-xs text-slate-400 font-medium">Nivel de Conversación:</label>
+                    <label class="text-xs text-slate-400 font-medium">Nivel:</label>
                     <div class="grid grid-cols-3 gap-1.5">
                         <button onclick="setLevel('Básico')" id="modal-btn-básico" class="py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-semibold">Básico</button>
                         <button onclick="setLevel('Medio')" id="modal-btn-medio" class="py-1.5 rounded-lg bg-slate-700 text-slate-300 text-xs font-semibold">Medio</button>
                         <button onclick="setLevel('Avanzado')" id="modal-btn-avanzado" class="py-1.5 rounded-lg bg-slate-700 text-slate-300 text-xs font-semibold">Avanzado</button>
                     </div>
                 </div>
-
-                <!-- Selector de Velocidad -->
                 <div class="space-y-1.5">
-                    <label class="text-xs text-slate-400 font-medium">Velocidad de Voz:</label>
+                    <label class="text-xs text-slate-400 font-medium">Velocidad:</label>
                     <div class="grid grid-cols-3 gap-1.5">
-                        <button onclick="setSpeed(0.8)" id="speed-08" class="py-1.5 rounded-lg bg-slate-700 text-slate-300 text-xs">0.8x Lento</button>
-                        <button onclick="setSpeed(1.0)" id="speed-10" class="py-1.5 rounded-lg bg-indigo-600 text-white text-xs">1.0x Normal</button>
-                        <button onclick="setSpeed(1.2)" id="speed-12" class="py-1.5 rounded-lg bg-slate-700 text-slate-300 text-xs">1.2x Rápido</button>
+                        <button onclick="setSpeed(0.8)" id="speed-08" class="py-1.5 rounded-lg bg-slate-700 text-slate-300 text-xs">0.8x</button>
+                        <button onclick="setSpeed(1.0)" id="speed-10" class="py-1.5 rounded-lg bg-indigo-600 text-white text-xs">1.0x</button>
+                        <button onclick="setSpeed(1.2)" id="speed-12" class="py-1.5 rounded-lg bg-slate-700 text-slate-300 text-xs">1.2x</button>
                     </div>
                 </div>
-
-                <!-- Selector de Voz (Mujer/Hombre) -->
                 <div class="space-y-1.5">
-                    <label class="text-xs text-slate-400 font-medium">Voz del Tutor:</label>
+                    <label class="text-xs text-slate-400 font-medium">Voz:</label>
                     <button onclick="toggleVoiceGender()" id="voice-toggle-card" class="w-full py-2 px-3 rounded-lg bg-slate-700 text-slate-200 text-xs flex items-center justify-between">
-                        <span>Voz de Mujer (Ramona)</span>
+                        <span>Mujer (Ramona)</span>
                         <i class="fa-solid fa-venus text-pink-400"></i>
                     </button>
                 </div>
-
-                <button onclick="toggleSettingsModal()" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow">Guardar y Cerrar</button>
+                <button onclick="toggleSettingsModal()" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl">Cerrar</button>
             </div>
         </div>
 
@@ -88,20 +78,18 @@
             <div class="flex items-start space-x-2">
                 <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">R</div>
                 <div class="bg-slate-800 border border-slate-700 rounded-2xl rounded-tl-sm p-3.5 max-w-[85%] text-sm text-slate-200 shadow-md">
-                    <p>Hello Mario Orbea! I am Ramona. Toca el botón de engranaje arriba a la derecha ⚙️ cuando quieras cambiar de nivel, velocidad o tipo de voz.<br><br>Let's start: How are you today?</p>
+                    <p>Hello Mario! I'm Ramona. It's great to practice with you today. Put on your headphones, tap the microphone when you're ready, and let's have a real chat.<br><br>How is your day going so far?</p>
                 </div>
             </div>
         </div>
 
-        <!-- PANEL DE CONTROL MANUAL DE VOZ Y TECLADO -->
+        <!-- PANEL DE CONTROL DE VOZ -->
         <div class="bg-slate-800 border-t border-slate-700 p-3 flex flex-col space-y-2">
             <div class="flex items-center space-x-2">
-                <!-- Botón de Grabación Manual -->
                 <button id="mic-btn" onclick="toggleManualRecording()" class="bg-indigo-600 hover:bg-indigo-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 shadow-lg transition-transform active:scale-95">
                     <i id="mic-icon" class="fa-solid fa-microphone"></i>
                 </button>
                 
-                <!-- Input de Texto -->
                 <form onsubmit="handleTextSubmit(event)" class="flex-1 flex items-center space-x-1">
                     <input type="text" id="user-input" placeholder="Toca el micro o escribe aquí..." autocomplete="off"
                         class="w-full bg-slate-900 border border-slate-700 text-slate-100 placeholder-slate-500 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500">
@@ -109,8 +97,8 @@
                 </form>
             </div>
             <div class="flex justify-between items-center px-1">
-                <span id="recording-status" class="text-[11px] text-slate-400 italic">Micrófono inactivo (Toca para hablar)</span>
-                <span class="text-[10px] text-slate-500">Mario Orbea App</span>
+                <span id="recording-status" class="text-[11px] text-slate-400 italic">Micrófono listo (Toca para grabar)</span>
+                <span class="text-[10px] text-slate-500">Mario Orbea</span>
             </div>
         </div>
 
@@ -124,7 +112,8 @@
         let currentLevel = "Básico";
         let isMaleVoice = false;
         let voicesList = [];
-        let lastMessageText = "Hello Mario Orbea! I am Ramona. How are you today?";
+        let lastMessageText = "Hello Mario! How is your day going so far?";
+        let conversationTurn = 0;
 
         function loadVoices() { voicesList = synth.getVoices(); }
         synth.onvoiceschanged = loadVoices;
@@ -150,21 +139,22 @@
                 isRecording = true;
                 const btn = document.getElementById('mic-btn');
                 const icon = document.getElementById('mic-icon');
-                btn.className = "bg-rose-600 hover:bg-rose-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 shadow-lg recording-active transition-transform";
+                btn.className = "bg-rose-600 hover:bg-rose-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 shadow-lg recording-pulse transition-transform";
                 icon.className = "fa-solid fa-stop";
-                document.getElementById('recording-status').innerText = "Grabando voz... (Habla ahora)";
+                document.getElementById('recording-status').innerText = "Escuchando por audífonos... (Habla ahora)";
             };
 
             recognition.onresult = (event) => {
                 const text = event.results[0][0].transcript.trim();
                 if (text) {
+                    stopManualRecording();
                     processUserSpeech(text);
                 }
             };
 
             recognition.onerror = () => {
                 stopManualRecording();
-                document.getElementById('recording-status').innerText = "No se detectó audio claro. Intenta de nuevo.";
+                document.getElementById('recording-status').innerText = "Micrófono listo. Toca para reintentar.";
             };
 
             recognition.onend = () => {
@@ -200,38 +190,27 @@
             const icon = document.getElementById('mic-icon');
             btn.className = "bg-indigo-600 hover:bg-indigo-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center text-xl flex-shrink-0 shadow-lg transition-transform active:scale-95";
             icon.className = "fa-solid fa-microphone";
-            document.getElementById('recording-status').innerText = "Micrófono inactivo (Toca para hablar)";
+            document.getElementById('recording-status').innerText = "Micrófono listo (Toca para grabar)";
         }
 
         function setLevel(level) {
             currentLevel = level;
             document.getElementById('level-display').innerText = `Nivel: ${currentLevel} | ${speechRate}x`;
-            
             ['Básico', 'Medio', 'Avanzado'].forEach(lvl => {
                 const b = document.getElementById(`modal-btn-${lvl.toLowerCase()}`);
-                if (lvl === level) {
-                    b.className = "py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-semibold";
-                } else {
-                    b.className = "py-1.5 rounded-lg bg-slate-700 text-slate-300 text-xs font-semibold";
-                }
+                if (lvl === level) b.className = "py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-semibold";
+                else b.className = "py-1.5 rounded-lg bg-slate-700 text-slate-300 text-xs font-semibold";
             });
-
-            if (level === "Básico") speakRamona("Switched to Basic level.");
-            else if (level === "Medio") speakRamona("Switched to Medium level.");
-            else speakRamona("Advanced level active.");
+            speakRamona(`Switched to ${level} level. Let's keep talking.`);
         }
 
         function setSpeed(rate) {
             speechRate = rate;
             document.getElementById('level-display').innerText = `Nivel: ${currentLevel} | ${speechRate}x`;
-
             [0.8, 1.0, 1.2].forEach(r => {
                 const b = document.getElementById(`speed-${r.toString().replace('.', '')}`);
-                if (r === rate) {
-                    b.className = "py-1.5 rounded-lg bg-indigo-600 text-white text-xs";
-                } else {
-                    b.className = "py-1.5 rounded-lg bg-slate-700 text-slate-300 text-xs";
-                }
+                if (r === rate) b.className = "py-1.5 rounded-lg bg-indigo-600 text-white text-xs";
+                else b.className = "py-1.5 rounded-lg bg-slate-700 text-slate-300 text-xs";
             });
         }
 
@@ -242,15 +221,15 @@
             const tutorName = document.getElementById('tutor-name');
             
             if (isMaleVoice) {
-                card.innerHTML = '<span>Voz de Hombre (Ray)</span><i class="fa-solid fa-mars text-blue-400"></i>';
+                card.innerHTML = '<span>Hombre (Ray)</span><i class="fa-solid fa-mars text-blue-400"></i>';
                 avatar.className = "w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-base shadow";
                 tutorName.innerText = "Ray";
             } else {
-                card.innerHTML = '<span>Voz de Mujer (Ramona)</span><i class="fa-solid fa-venus text-pink-400"></i>';
+                card.innerHTML = '<span>Mujer (Ramona)</span><i class="fa-solid fa-venus text-pink-400"></i>';
                 avatar.className = "w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-base shadow";
                 tutorName.innerText = "Ramona";
             }
-            speakRamona("Voice changed successfully.");
+            speakRamona("Voice updated.");
         }
 
         function repeatLastMessage() {
@@ -276,6 +255,7 @@
             synth.speak(utterThis);
         }
 
+        // DIÁLOGO HUMANO Y ABIERTO REAL (LIBRE DE BUCLES ROBÓTICOS)
         function processUserSpeech(text) {
             const chatContainer = document.getElementById('chat-container');
 
@@ -283,19 +263,46 @@
                 <div class="flex items-start justify-end space-x-2">
                     <div class="bg-indigo-600 text-white rounded-2xl rounded-tr-sm p-3.5 max-w-[85%] text-sm shadow">
                         <p>${escapeHtml(text)}</p>
-                        <span class="text-[10px] text-indigo-200 mt-1 block text-right">Mario Orbea</span>
+                        <span class="text-[10px] text-indigo-200 mt-1 block text-right">Mario</span>
                     </div>
                 </div>
             `;
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
+            conversationTurn++;
             let responseText = "";
-            if (currentLevel === "Básico") {
-                responseText = `Good job, Mario! You said: "${text}". Let's continue: What is your favorite hobby?`;
-            } else if (currentLevel === "Medio") {
-                responseText = `Well articulated, Mario. Regarding "${text}", could you explain why you feel that way?`;
+            const lower = text.toLowerCase();
+
+            // Lógica de conversación natural estilo humano
+            if (lower.includes('correction') || lower.includes('mistake') || lower.includes('correct')) {
+                responseText = `Sure thing, Mario! Overall your sentence was good, but always pay attention to your verb tenses. Let's keep going: What are your plans for tomorrow?`;
             } else {
-                responseText = `Sophisticated phrasing, Mario. Analyzing your perspective on "${text}", what underlying factors drive that?`;
+                const responsesBasic = [
+                    `That's really interesting, Mario! Tell me more about that.`,
+                    `I understand. How long have you been interested in that topic?`,
+                    `That sounds cool! What is another thing you like to do during your week?`,
+                    `Thanks for sharing, Mario. Do you prefer doing that in the morning or at night?`
+                ];
+                
+                const responsesMedium = [
+                    `That's a solid point, Mario. What do you think is the main reason behind that?`,
+                    `Very interesting observation! Have you always felt that way, or did something change recently?`,
+                    `I see where you're coming from. How does that usually impact your daily routine?`
+                ];
+
+                const responsesAdvanced = [
+                    `That's quite a nuanced perspective, Mario. What underlying factors do you believe contribute most to that outcome?`,
+                    `Fascinating viewpoint. How do you reconcile that approach when facing unexpected challenges?`,
+                    `An insightful observation indeed. Could you elaborate on the long-term implications of that?`
+                ];
+
+                if (currentLevel === "Básico") {
+                    responseText = responsesBasic[conversationTurn % responsesBasic.length];
+                } else if (currentLevel === "Medio") {
+                    responseText = responsesMedium[conversationTurn % responsesMedium.length];
+                } else {
+                    responseText = responsesAdvanced[conversationTurn % responsesAdvanced.length];
+                }
             }
 
             setTimeout(() => {
@@ -304,13 +311,13 @@
                         <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">R</div>
                         <div class="bg-slate-800 border border-slate-700 rounded-2xl rounded-tl-sm p-3.5 max-w-[85%] text-sm text-slate-200 shadow-md">
                             <p>${escapeHtml(responseText)}</p>
-                            <span class="text-[10px] text-slate-500 mt-1 block text-right">Ramona (${currentLevel})</span>
+                            <span class="text-[10px] text-slate-500 mt-1 block text-right">Ramona</span>
                         </div>
                     </div>
                 `;
                 chatContainer.scrollTop = chatContainer.scrollHeight;
                 speakRamona(responseText);
-            }, 300);
+            }, 400);
         }
 
         function handleTextSubmit(e) {
@@ -328,7 +335,7 @@
 
         window.onload = () => {
             setTimeout(() => {
-                speakRamona("Hello Mario Orbea! I am Ramona. Audio system is active. Tap the gear icon at the top right to change levels or voice settings.");
+                speakRamona("Hello Mario! I am Ramona. Put on your headphones, tap the microphone when you want to talk, and let's have a normal conversation.");
             }, 500);
         };
     </script>
