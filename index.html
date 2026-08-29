@@ -3,17 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ramona English - Voice Chat</title>
+    <title>Ramona English - Real Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         body { overscroll-behavior-y: none; background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
         .app-container { height: 100vh; height: 100dvh; }
-        .pulse-ring { animation: pulse 2s infinite; }
-        @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        .wave-animation span {
+            animation: wave 1.2s infinite ease-in-out;
+        }
+        .wave-animation span:nth-child(2) { animation-delay: 0.2s; }
+        .wave-animation span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes wave {
+            0%, 60%, 100% { transform: scaleY(0.4); }
+            30% { transform: scaleY(1); }
         }
     </style>
 </head>
@@ -23,15 +26,25 @@
         <!-- HEADER -->
         <header class="bg-slate-800 border-b border-slate-700 px-4 py-3 flex items-center justify-between z-10">
             <div class="flex items-center space-x-3">
-                <div id="ramona-avatar" class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow">R</div>
+                <div id="avatar-icon" class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow">R</div>
                 <div>
                     <h1 class="font-bold text-base text-slate-100 flex items-center gap-1">
-                        Ramona <span id="level-badge" class="text-xs bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded-full border border-indigo-500/30">Nivel Básico</span>
+                        <span id="tutor-name">Ramona</span> 
+                        <span id="level-badge" class="text-xs bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded-full border border-indigo-500/30">Nivel Básico</span>
                     </h1>
-                    <p id="status-text" class="text-xs text-slate-400">Toca el micrófono para hablar</p>
+                    <p id="status-text" class="text-xs text-emerald-400 flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Modo Libre Activo
+                    </p>
                 </div>
             </div>
-            <button onclick="speakWelcome()" class="text-slate-400 hover:text-white p-2" title="Repetir saludo"><i class="fa-solid fa-volume-high text-lg"></i></button>
+            <div class="flex items-center space-x-1">
+                <!-- Botón cambio de velocidad -->
+                <button onclick="toggleSpeed()" id="speed-btn" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 px-2 py-1.5 rounded font-mono transition-colors" title="Velocidad">1.0x</button>
+                <!-- Botón cambio de voz (Mujer/Hombre) -->
+                <button onclick="toggleVoiceGender()" id="voice-btn" class="text-slate-300 hover:text-white p-2 rounded-lg bg-slate-700/50" title="Cambiar Voz"><i class="fa-solid fa-venus text-pink-400"></i></button>
+                <!-- Botón opciones texto/teclado -->
+                <button onclick="toggleKeyboardPanel()" class="text-slate-400 hover:text-white p-2" title="Teclado / Dictado"><i class="fa-solid fa-keyboard text-lg"></i></button>
+            </div>
         </header>
 
         <!-- CHAT FEED -->
@@ -39,20 +52,31 @@
             <div class="flex items-start space-x-2">
                 <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">R</div>
                 <div class="bg-slate-800 border border-slate-700 rounded-2xl rounded-tl-sm p-3.5 max-w-[85%] text-sm text-slate-200 shadow-md">
-                    <p>Hello Mario Orbea! I am Ramona, your personal English tutor. Nivel básico y voz natural activos. Di "baja la velocidad", "corrígeme" o lo que necesites en cualquier momento.<br><br>Let's start: How are you today?</p>
+                    <p>Hello Mario Orbea! I am Ramona, your personal English tutor. El modo de conversación continua está activo. Solo háblame con libertad, te escucharé y responderé automáticamente sin botones.<br><br>Let's start: How are you today?</p>
                 </div>
             </div>
         </div>
 
-        <!-- PANEL DE CONTROL DE VOZ / AUDIO -->
-        <div class="bg-slate-800 border-t border-slate-700 p-4 flex flex-col items-center space-y-3">
-            <div class="flex items-center justify-center w-full space-x-4">
-                <!-- Botón principal de Micrófono con Voz Real -->
-                <button id="mic-btn" onclick="toggleListening()" class="w-16 h-16 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center text-2xl shadow-lg transition-transform active:scale-95">
-                    <i id="mic-icon" class="fa-solid fa-microphone"></i>
-                </button>
+        <!-- INDICADOR DE ESCUCHA ACTIVA (WAVE) -->
+        <div id="live-indicator" class="bg-slate-900/90 border-t border-slate-800 px-4 py-2 flex items-center justify-between text-xs text-slate-400">
+            <div class="flex items-center space-x-2">
+                <div class="flex space-x-1 wave-animation h-4 items-center">
+                    <span class="w-1 bg-indigo-500 rounded-full h-full"></span>
+                    <span class="w-1 bg-indigo-500 rounded-full h-full"></span>
+                    <span class="w-1 bg-indigo-500 rounded-full h-full"></span>
+                </div>
+                <span id="live-status-label">Escuchando tu voz en tiempo real...</span>
             </div>
-            <p id="transcript-preview" class="text-xs text-slate-400 italic text-center h-4 truncate w-full px-4">Escuchando tus órdenes o respuestas...</p>
+            <button onclick="toggleContinuousListening()" id="mic-toggle-switch" class="text-rose-400 hover:text-rose-300 font-semibold">Pausar auto-mic</button>
+        </div>
+
+        <!-- PANEL FLOTANTE DE TECLADO / DICTADO (Oculto por defecto) -->
+        <div id="keyboard-panel" class="hidden bg-slate-800 border-t border-slate-700 p-3">
+            <form onsubmit="handleTextSubmit(event)" class="flex items-center space-x-2">
+                <input type="text" id="user-input" placeholder="Escribe aquí si lo prefieres..." autocomplete="off"
+                    class="flex-1 bg-slate-900 border border-slate-700 text-slate-100 placeholder-slate-500 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500">
+                <button type="submit" class="bg-indigo-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow">Enviar</button>
+            </form>
         </div>
 
     </div>
@@ -60,104 +84,168 @@
     <script>
         const synth = window.speechSynthesis;
         let recognition;
-        let isListening = false;
-        let speechRate = 1.0; // Velocidad normal por defecto
+        let isContinuousActive = true;
+        let speechRate = 1.0;
         let currentLevel = "Básico";
+        let isMaleVoice = false; // Por defecto voz de mujer cálida
+        let voicesList = [];
 
-        // Inicializar reconocimiento de voz nativo del celular
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        // Cargar voces del sistema
+        function loadVoices() {
+            voicesList = synth.getVoices();
+        }
+        synth.onvoiceschanged = loadVoices;
+        loadVoices();
+
+        // Inicializar reconocimiento continuo (Real-Pro)
+        function initRecognition() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
-            recognition.lang = 'en-US'; // Escucha en inglés prioritario para la práctica
-            recognition.continuous = false;
-            recognition.interimResults = true;
+            if (!SpeechRecognition) {
+                alert("Tu navegador no soporta el reconocimiento de voz continuo. Usa Google Chrome.");
+                return;
+            }
 
-            recognition.onstart = () => {
-                isListening = true;
-                document.getElementById('mic-btn').classList.add('bg-rose-600', 'pulse-ring');
-                document.getElementById('mic-icon').className = "fa-solid fa-microphone-slash";
-                document.getElementById('status-text').innerText = "Escuchando...";
-            };
+            recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.continuous = false; // Se reinicia solo para mantener flujo dinámico
+            recognition.interimResults = false;
 
             recognition.onresult = (event) => {
-                let interim = '';
-                let final = '';
-                for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    if (event.results[i].isFinal) {
-                        final += event.results[i][0].transcript;
-                    } else {
-                        interim += event.results[i][0].transcript;
-                    }
-                }
-                if (final) {
-                    document.getElementById('transcript-preview').innerText = `Tú: "${final}"`;
-                    handleUserVoiceInput(final);
-                } else if (interim) {
-                    document.getElementById('transcript-preview').innerText = interim;
+                const speechResult = event.results[0][0].transcript.trim();
+                if (speechResult) {
+                    processUserSpeech(speechResult);
                 }
             };
 
             recognition.onerror = (event) => {
-                stopListening();
+                // Reiniciar si hay silencio o error menor para no cortar la charla
+                if (isContinuousActive && event.error !== 'aborted') {
+                    setTimeout(() => startListeningSafe(), 500);
+                }
             };
 
             recognition.onend = () => {
-                stopListening();
+                // Si está activo el modo continuo, vuelve a escuchar automáticamente tras terminar Ramona
+                if (isContinuousActive && !synth.speaking) {
+                    setTimeout(() => startListeningSafe(), 300);
+                }
             };
-        } else {
-            alert("Tu navegador no soporta reconocimiento de voz nativo. Usa Google Chrome actualizado.");
+
+            startListeningSafe();
         }
 
-        function toggleListening() {
-            if (!recognition) return;
-            if (isListening) {
-                recognition.stop();
-            } else {
-                try {
-                    recognition.start();
-                } catch(e) {
-                    recognition.stop();
-                }
+        function startListeningSafe() {
+            if (!isContinuousActive || synth.speaking) return;
+            try {
+                recognition.start();
+                document.getElementById('live-status-label').innerText = "Escuchando en vivo...";
+            } catch(e) {
+                // Ya estaba activo
             }
         }
 
-        function stopListening() {
-            isListening = false;
-            document.getElementById('mic-btn').classList.remove('bg-rose-600', 'pulse-ring');
-            document.getElementById('mic-icon').className = "fa-solid fa-microphone";
-            document.getElementById('status-text').innerText = "Toca el micrófono para hablar";
+        function stopListeningSafe() {
+            try {
+                recognition.stop();
+            } catch(e){}
         }
 
-        // Función para que Ramona hable con voz natural
-        function speakRamona(text, lang = 'en-US') {
+        function toggleContinuousListening() {
+            isContinuousActive = !isContinuousActive;
+            const btn = document.getElementById('mic-toggle-switch');
+            if (isContinuousActive) {
+                btn.innerText = "Pausar auto-mic";
+                btn.className = "text-rose-400 hover:text-rose-300 font-semibold";
+                startListeningSafe();
+            } else {
+                btn.innerText = "Activar auto-mic";
+                btn.className = "text-emerald-400 hover:text-emerald-300 font-semibold";
+                stopListeningSafe();
+                document.getElementById('live-status-label').innerText = "Micrófono pausado manualmente";
+            }
+        }
+
+        // Cambiar velocidad (1.0x -> 1.25x -> 0.75x)
+        function toggleSpeed() {
+            const btn = document.getElementById('speed-btn');
+            if (speechRate === 1.0) {
+                speechRate = 0.8; // Más lento
+                btn.innerText = "0.8x";
+            } else if (speechRate === 0.8) {
+                speechRate = 1.2; // Más rápido
+                btn.innerText = "1.2x";
+            } else {
+                speechRate = 1.0; // Normal
+                btn.innerText = "1.0x";
+            }
+        }
+
+        // Cambiar entre voz de Mujer y Hombre
+        function toggleVoiceGender() {
+            isMaleVoice = !isMaleVoice;
+            const btn = document.getElementById('voice-btn');
+            const avatar = document.getElementById('avatar-icon');
+            const tutorName = document.getElementById('tutor-name');
+            
+            if (isMaleVoice) {
+                btn.innerHTML = '<i class="fa-solid fa-mars text-blue-400"></i>';
+                avatar.className = "w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow";
+                tutorName.innerText = "Ray";
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-venus text-pink-400"></i>';
+                avatar.className = "w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow";
+                tutorName.innerText = "Ramona";
+            }
+            speakRamona("Voice switched, Mario. Let's continue.");
+        }
+
+        function toggleKeyboardPanel() {
+            const panel = document.getElementById('keyboard-panel');
+            panel.classList.toggle('hidden');
+            if(!panel.classList.contains('hidden')) {
+                document.getElementById('user-input').focus();
+            }
+        }
+
+        // Función para que la tutora hable con voz natural clara y cálida
+        function speakRamona(text) {
+            stopListening(); // Pausar escucha mientras habla para que no se escuche a sí misma
             if (synth.speaking) synth.cancel();
+
             const utterThis = new SpeechSynthesisUtterance(text);
             utterThis.rate = speechRate;
-            utterThis.pitch = 1.0;
-            utterThis.lang = lang;
-            
-            // Intentar buscar una voz en inglés/español natural del sistema
-            const voices = synth.getVoices();
-            const voice = voices.find(v => v.lang.includes(lang.substring(0,2)));
+            utterThis.pitch = isMaleVoice ? 0.8 : 1.2; // Tono grave para hombre, cálido/claro para mujer
+            utterThis.lang = 'en-US';
+
+            // Buscar la mejor voz nativa disponible en el dispositivo
+            loadVoices();
+            const voice = voicesList.find(v => {
+                if (isMaleVoice) return v.lang.includes('en') && (v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('david') || v.name.toLowerCase().includes('george'));
+                return v.lang.includes('en') && (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('zira') || v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('karen'));
+            }) || voicesList.find(v => v.lang.includes('en')) || voicesList[0];
+
             if (voice) utterThis.voice = voice;
+
+            utterThis.onend = () => {
+                // Al terminar de hablar, reactiva el micrófono automáticamente para que tú contestes
+                if (isContinuousActive) {
+                    setTimeout(() => startListeningSafe(), 400);
+                }
+            };
 
             synth.speak(utterThis);
         }
 
-        function speakWelcome() {
-            speakRamona("Hello Mario Orbea! I am Ramona, your personal English tutor. How are you today?");
-        }
-
-        // Procesar lo que Mario dice y evaluar si es una orden o práctica
-        function handleUserVoiceInput(text) {
+        // Procesar entrada del usuario (por voz automática o por teclado)
+        function processUserSpeech(text) {
             const chatContainer = document.getElementById('chat-container');
             const lowerText = text.toLowerCase();
 
-            // 1. Mostrar burbuja del usuario
+            // 1. Mostrar burbuja de Mario
             chatContainer.innerHTML += `
                 <div class="flex items-start justify-end space-x-2">
                     <div class="bg-indigo-600 text-white rounded-2xl rounded-tr-sm p-3.5 max-w-[85%] text-sm shadow">
-                        <p>${text}</p>
+                        <p>${escapeHtml(text)}</p>
                         <span class="text-[10px] text-indigo-200 mt-1 block text-right">Mario Orbea</span>
                     </div>
                 </div>
@@ -165,41 +253,60 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
             let responseText = "";
-            let speechLang = 'en-US';
 
-            // 2. Gestionar órdenes directas del usuario en la conversación
-            if (lowerText.includes('baja la velocidad') || lowerText.includes('lento') || lowerText.includes('slow')) {
-                speechRate = 0.75;
-                responseText = "Understood, Mario. I will speak slower from now on. Let's continue.";
-            } else if (lowerText.includes('velocidad normal') || lowerText.includes('normal speed')) {
-                speechRate = 1.0;
-                responseText = "Back to normal speed, Mario. Let's keep practicing.";
+            // 2. Evaluar órdenes de control del diálogo en tiempo real
+            if (lowerText.includes('baja la velocidad') || lowerText.includes('slow down') || lowerText.includes('lento')) {
+                speechRate = 0.8;
+                document.getElementById('speed-btn').innerText = "0.8x";
+                responseText = "Understood, Mario. I am speaking slower now. Let's keep talking.";
             } else if (lowerText.includes('nivel medio') || lowerText.includes('medium level')) {
                 currentLevel = "Medio";
                 document.getElementById('level-badge').innerText = "Nivel Medio";
-                responseText = "Switched to medium level, Mario. Let's increase the complexity.";
-            } else if (lowerText.includes('corrígeme') || lowerText.includes('error')) {
-                responseText = "Let's check your grammar, Mario. Always remember to use the correct verb tense. Try repeating the sentence correctly.";
+                responseText = "Switched to medium level, Mario. Let's make our conversation more interesting.";
+            } else if (lowerText.includes('corrígeme') || lowerText.includes('correct me') || lowerText.includes('error')) {
+                responseText = "Let's check your last phrase, Mario. Focus on pronouncing clearly and check your verb tenses. Let's try again: how would you say that?";
             } else {
-                // Diálogo estándar de práctica con corrección simulada / real
-                responseText = `Good job, Mario! You said: "${text}". Keep practicing this structure with me. What else would you like to say?`;
+                // Diálogo continuo natural con nativo
+                responseText = `Great expression, Mario! You said: "${text}". Let's continue: Can you tell me more about that or use this word in another sentence?`;
             }
 
-            // 3. Mostrar respuesta de Ramona en pantalla y reproducir audio real
+            // 3. Responder con voz natural
             setTimeout(() => {
                 chatContainer.innerHTML += `
                     <div class="flex items-start space-x-2">
                         <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">R</div>
                         <div class="bg-slate-800 border border-slate-700 rounded-2xl rounded-tl-sm p-3.5 max-w-[85%] text-sm text-slate-200 shadow-md">
-                            <p>${responseText}</p>
+                            <p>${escapeHtml(responseText)}</p>
                             <span class="text-[10px] text-slate-500 mt-1 block text-right">Ramona</span>
                         </div>
                     </div>
                 `;
                 chatContainer.scrollTop = chatContainer.scrollHeight;
-                speakRamona(responseText, speechLang);
-            }, 600);
+                speakRamona(responseText);
+            }, 500);
         }
+
+        function handleTextSubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById('user-input');
+            const val = input.value.trim();
+            if (!val) return;
+            input.value = '';
+            toggleKeyboardPanel();
+            processUserSpeech(val);
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        // Iniciar motor al cargar la página
+        window.onload = () => {
+            setTimeout(() => {
+                initRecognition();
+                speakRamona("Hello Mario Orbea! I am Ramona, your personal English tutor. Our real conversation starts now. How are you today?");
+            }, 1000);
+        };
     </script>
 </body>
 </html>
